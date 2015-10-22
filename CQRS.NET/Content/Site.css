@@ -1,0 +1,93 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+.alert-overlay{
+    background-color:rgba(0,0,0,0.6);
+    background-size:contain;
+    width:100%;
+    height:100%;
+    position:fixed; 
+    top:0; left:0; 
+    z-index:899999999999; 
+    display:none; 
+}
+.alert-overlay .show, .alert-box .show{
+    display:block; 
+}
+
+.alert-box{
+    display:none;
+    width:100%;
+    min-height:30%;
+    top:30%;
+    position:absolute;
+    overflow: hidden;
+    border:2px solid #fff;
+    border-left-width:0px;
+    border-right-width:0px;
+}
+.alert-box a {
+    color: #428bca;
+}
+.alert-box span {
+    color: #000;
+    font-size:small;
+}
+.alert-box.alert-box-success {
+  color: #468847;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+    /*background-color: #008a00;*/
+}
+.alert-box.alert-box-info {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+.alert-box.alert-box-warning {
+  color: #c09853;
+  background-color: #fcf8e3;
+  border-color: #fbeed5;
+}
+.alert-box.alert-box-danger {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+}
+.alert-actions{
+    width: 305px;
+    overflow: hidden;
+     margin-top:30px;
+   /* margin:140px 0px 0px 500px;*/
+}
+
+.alert-actions button{
+    
+   border:none;
+   border:2px solid white;
+   outline:none;
+   background-color:transparent;    
+   height:35px;
+   min-width:100px;
+}

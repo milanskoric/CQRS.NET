@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31010.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CQRS.NET", "CQRS.NET\CQRS.NET.csproj", "{8D59E8E2-C109-4A19-8A33-1D12D238E0A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 Runtime", "01 Runtime", "{CA2E1F52-F974-4D45-833E-5774C6D66A70}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 BoundedContexts", "02 BoundedContexts", "{7C70FC1A-E9F8-470E-9C8D-878BEB0601D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "SharedKernel\SharedKernel.csproj", "{4AB0545C-8681-4490-8288-47F317068B1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comments.Domain", "Comments\Comments.Domain.csproj", "{83DCD52D-B0C6-40F8-A7E6-1A49BE59CF80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comments.Core", "Comments.Core\Comments.Core.csproj", "{BE684412-89CA-463C-9EC9-C6FE375FE808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comments.Infrastructure", "Comments.Infrastructure\Comments.Infrastructure.csproj", "{CBC88B24-2EF3-49E7-A172-087E39AD86AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel.Infrastructure", "SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj", "{36E61310-0F53-4530-9BD7-1DAF82364CEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D59E8E2-C109-4A19-8A33-1D12D238E0A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D59E8E2-C109-4A19-8A33-1D12D238E0A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D59E8E2-C109-4A19-8A33-1D12D238E0A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D59E8E2-C109-4A19-8A33-1D12D238E0A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AB0545C-8681-4490-8288-47F317068B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB0545C-8681-4490-8288-47F317068B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AB0545C-8681-4490-8288-47F317068B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AB0545C-8681-4490-8288-47F317068B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83DCD52D-B0C6-40F8-A7E6-1A49BE59CF80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83DCD52D-B0C6-40F8-A7E6-1A49BE59CF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83DCD52D-B0C6-40F8-A7E6-1A49BE59CF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83DCD52D-B0C6-40F8-A7E6-1A49BE59CF80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE684412-89CA-463C-9EC9-C6FE375FE808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE684412-89CA-463C-9EC9-C6FE375FE808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE684412-89CA-463C-9EC9-C6FE375FE808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE684412-89CA-463C-9EC9-C6FE375FE808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBC88B24-2EF3-49E7-A172-087E39AD86AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBC88B24-2EF3-49E7-A172-087E39AD86AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBC88B24-2EF3-49E7-A172-087E39AD86AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBC88B24-2EF3-49E7-A172-087E39AD86AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36E61310-0F53-4530-9BD7-1DAF82364CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36E61310-0F53-4530-9BD7-1DAF82364CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36E61310-0F53-4530-9BD7-1DAF82364CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36E61310-0F53-4530-9BD7-1DAF82364CEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4AB0545C-8681-4490-8288-47F317068B1C} = {CA2E1F52-F974-4D45-833E-5774C6D66A70}
+		{83DCD52D-B0C6-40F8-A7E6-1A49BE59CF80} = {7C70FC1A-E9F8-470E-9C8D-878BEB0601D1}
+		{BE684412-89CA-463C-9EC9-C6FE375FE808} = {7C70FC1A-E9F8-470E-9C8D-878BEB0601D1}
+		{CBC88B24-2EF3-49E7-A172-087E39AD86AE} = {7C70FC1A-E9F8-470E-9C8D-878BEB0601D1}
+		{36E61310-0F53-4530-9BD7-1DAF82364CEB} = {CA2E1F52-F974-4D45-833E-5774C6D66A70}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,157 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Helo World</h1>
+ 
+<button onclick="btnPostOnClick()">Post</button> <button onclick="btnPostWihtResultOnClick()">Post With Result</button> <button onclick="btnPostAsyncOnClick()">Post Async</button> <button onclick="btnFindAllOnClick()">Find All</button> <button onclick="btnFindAllWithWrapOnClick()">Find All With Wrap</button>
+@section scripts{
+<script>
+    function btnPostOnClick() {
+        var cmd = new Object();
+        cmd.Content = "Sinergija 15";
+        var url = '/api/Command/CreateCommentCommand';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(cmd),
+            headers: { "x-your-app-id": "1000", "x-your-lang-code": "1033" },
+            contentType: 'application/json; charset=utf-8',
+            success: function (data, textStatus, xhr) {
+                alertshow(1, "Successfully Saved!", "Recommended next actions:",
+                           "<a onclick='btnPostWihtResultOnClick()'>Post with result</a>" + "<br/>"
+                           + "<span class='pull-right'>Object Id: "
+                           + data + "</span>");
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(textStatus + "" + errorThrown)
+                console.log('error in ajax');
+            }
+        });
+    }
+
+    function btnPostWihtResultOnClick() {
+        var cmd = new Object();
+        cmd.Content = "Sinergija 15";
+        var url = '/api/Command/CreateCommentCommand?Format=json';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(cmd),
+            headers: { "x-your-app-id": "1000", "x-your-lang-code": "1033" },
+            contentType: 'application/json; charset=utf-8',
+            success: function (data, textStatus, xhr) {
+                alertshow(1, "Successfully Saved! ", "Recommended next actions:",
+                          "<a onclick='btnPostAsyncOnClick()'>Post Async</a>" + "<br/>"
+                          + "<span class='pull-right'>Id:"
+                          + data.ObjectId
+                          + " Execute Time: "
+                          + data.ExecuteTime
+                          + " RecordsAffected: "
+                          + data.RecordsAffected + "</span>");
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(textStatus + "" + errorThrown)
+                console.log('error in ajax');
+            }
+        });
+    }
+    function btnPostAsyncOnClick() {
+        var cmd = new Object();
+        cmd.Content = "Sinergija 15";
+        var url = '/api/Command/CreateCommentCommand?Format=json&IsAsync=true';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(cmd),
+            headers: { "x-your-app-id": "1000", "x-your-lang-code": "1033" },
+            contentType: 'application/json; charset=utf-8',
+            success: function (data, textStatus, xhr) {
+                alertshow(1, "Successfully Saved! ", "Recommended next actions:",
+                           "<a onclick='btnFindAllOnClick()'>Find All</a>" + "<br/>"
+                           + "<span class='pull-right'>Id:"
+                           + data.ObjectId
+                           + " Execute Time: "
+                           + data.ExecuteTime
+                           + " RecordsAffected: "
+                           + data.RecordsAffected + "</span>");
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(textStatus + "" + errorThrown)
+                console.log('error in ajax');
+            }
+        });
+    }
+
+    function btnFindAllOnClick() {
+        var cmd = new Object();
+        
+        var url = '/api/Query/FindAllComments';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(cmd),
+            headers: { "x-your-app-id": "1000", "x-your-lang-code": "1033" },
+            contentType: 'application/json; charset=utf-8',
+            success: function (result, textStatus, xhr) {
+                $("#panelComments").empty();
+                $.each(result, function (inx, value) {
+                    
+                    $("#panelComments").append('<li>' + value.Id + '. ' + value.Content + ' - ' + value.CorrelationId + '</li>')
+                });
+
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(textStatus + "" + errorThrown)
+                console.log('error in ajax');
+            }
+        });
+
+    }
+
+    function btnFindAllWithWrapOnClick() {
+        var cmd = new Object();
+
+        var url = '/api/Query/FindAllComments?withwrap=true';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(cmd),
+            headers: { "x-your-app-id": "1000", "x-your-lang-code": "1033" },
+            contentType: 'application/json; charset=utf-8',
+            success: function (result, textStatus, xhr) {
+                alertshow(1, "Find All Data With Wrap! ", "Recommended next actions:",
+                         "<a onclick='btnFindAllOnClick()'>Find All</a>" + "<br/>"
+                         + "<span class='pull-right'>"
+                         + " Execute Time: "
+                         + result.ExecuteTime
+                         + " RecordsAffected: "
+                         + result.RecordsAffected + "</span>");
+                $("#panelComments").empty();
+                $.each(result.Data, function (inx, value) {
+                    
+                    $("#panelComments").append('<li>' + value.Id + '. ' + value.Content + ' - ' + value.CorrelationId + '</li>')
+                });
+
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(textStatus + "" + errorThrown)
+                console.log('error in ajax');
+            }
+        });
+
+    }
+</script>
+    <ul id="panelComments">
+
+    </ul>
+}
