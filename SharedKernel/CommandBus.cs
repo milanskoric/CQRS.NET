@@ -12,6 +12,7 @@ namespace SharedKernel
         IEventStore _store = null;
         ICommandDispatcher _commandDispatcher = null;
 
+
         public CommandBus(IEventStore store, ICommandDispatcher cmmandDispatcher)
         {
             this._store = store;
@@ -20,29 +21,6 @@ namespace SharedKernel
             
         }
 
-        public static void ReplayEvent(IDomainEvent msg)
-        {
-            using (ICommandBus cb = ServiceLocator.Current.TryGet<ICommandBus>())
-            {
-                cb.Replay(msg);
-            }
-        }
-
-        public static Result Submit(ICommandMessage msg, InvocationContext ctx)
-        {
-            using (ICommandBus cb = ServiceLocator.Current.TryGet<ICommandBus>())
-            {
-                return cb.Send(msg, ctx);
-            }
-        }
-
-        public static void RaiseEvent(IDomainEvent msg, InvocationContext ctx)
-        {
-            using (ICommandBus cb = ServiceLocator.Current.TryGet<ICommandBus>())
-            {
-                cb.Publish(msg, ctx);
-            }
-        }
 
    
         public Result Send(ICommandMessage command, InvocationContext context)
@@ -53,7 +31,7 @@ namespace SharedKernel
 
                 IEnumerable<ValidationResult> vResults = new List<ValidationResult>();
 
-                output.Success = this.IsValid(command, out vResults);
+                output.Success = this.IsValid(command, out vResults);//validate the command before submitting
 
                 output.ValidationResults = vResults;
 
@@ -61,6 +39,7 @@ namespace SharedKernel
                 {
                     CommandOptions option = context.Options as CommandOptions;
 
+                    //hook the right command handler with command message and execute the command operation
                     if (option != null && option.IsAsync)
                     {
                         var task = Task.Factory.StartNew(() => this.Dispach(command, context));
@@ -151,7 +130,32 @@ namespace SharedKernel
 
         protected Result Dispach(ICommandMessage message, InvocationContext context)
         {
-           return _commandDispatcher.Dispatch<ICommandMessage>(message, context);
+           Result output = _commandDispatcher.Dispatch<ICommandMessage>(message, context);
+
+           if (output != null)
+                PublishChanges(output.Data as AggregateRoot, message, context);
+
+           return output;
+        }
+
+        protected void PublishChanges(AggregateRoot aggregateRoot, ICommandMessage message, InvocationContext context)
+        {
+            if (aggregateRoot == null)
+                return;
+
+            if (aggregateRoot.HasChanges())
+            {
+                foreach (var change in aggregateRoot.Changes)
+                {
+                    if (change.CorrelationId == aggregateRoot.CorrelationId)
+                        change.AggregateRootID = aggregateRoot.Id;
+
+                    change.SourceName = this.GetType().Name;
+                    change.Payload = message;
+
+                    this.Publish(change, context);
+                }
+            }
         }
 
         public void Dispose()

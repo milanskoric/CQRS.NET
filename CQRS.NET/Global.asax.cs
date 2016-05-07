@@ -55,7 +55,7 @@ namespace CQRS.NET
 
             bootstrapperTypes.ForEach(b => initBootstrapper(b, _container));                
         }
-
+        
         private void initBootstrapper(Type bootstrapperType, UnityContainer container)
         {
             UnityContainerExtension extension = null;

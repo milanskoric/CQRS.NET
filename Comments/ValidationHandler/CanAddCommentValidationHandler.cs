@@ -8,14 +8,19 @@ using System.Threading.Tasks;
 
 namespace Comments
 {
-    public class CanAddCommentValidationHandler : IValidationHandler<CreateCommentCommand>
+    public class CanAddCommentValidationHandler : IValidationHandler<CreateComment>
     {
-        public IEnumerable<ValidationResult> Validate(CreateCommentCommand command)
+        public IEnumerable<ValidationResult> Validate(CreateComment command)
         {
             List<ValidationResult> output = new List<ValidationResult>();
 
+            if (command == null || string.IsNullOrWhiteSpace(command.CorrelationId))
+                output.Add(new ValidationResult(
+                    2210, "Content", "Content of message correlation Id is null", string.Empty));
+
             if (command == null || string.IsNullOrWhiteSpace(command.Content))
-                output.Add(new ValidationResult(){Code=2233, Target = "Content", Message = "Content of comment is null or empty", Success = false, ObjectId = command.CorrelationId});
+                output.Add(new ValidationResult( 
+                    2220, "Content", "Content of comment is null or empty", command.CorrelationId));
 
             return output;
         }

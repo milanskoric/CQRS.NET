@@ -3,41 +3,52 @@ using SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharedKernel.Infrastructure;
+using Comments.Core;
 
 namespace Comments.Infrastructure
 {
-    public class CommentsReadRepository  : IRepository 
+    public class CommentsReadUnitOfWork : UnitOfWork
     {
-        IEventStore _store = null;
+        public static readonly string Identifier = "CommentsUnitOfWorkRead";
 
-        public CommentsReadRepository(IEventStore _store)
+        public CommentsReadUnitOfWork(ICommentReadRepository commentsReadRepository)
+            : base(null, commentsReadRepository)
         {
-            this._store = _store;
+            
+
         }
 
-        public static readonly string Identifier = "CommentsRepositoryRead";
+        private Collection<Comment> _Comments = new Collection<Comment>();
 
-        public void Build()
+        public override void Set<TEntity>(TEntity entity, InvocationContext context)
         {
-            if (_store != null )
+            if (entity is Comment)
             {
-                var changes = _store.GetAllEvents();
+                Comment commnet = entity as Comment;
 
-                if (changes != null && changes.Count() > 0)
+                if (commnet.Id == 0)
                 {
-                    foreach (var change in changes)
-                    {
-                        CommandBus.ReplayEvent(change);
-                    }
+                    long id = 0;
+
+                    if (_Comments.Count > 0)
+                        id = _Comments.Max(t => t.Id);
+                    id++;
+                    commnet.Id = id;
                 }
+                commnet.Guid = Guid.NewGuid();
+
+                _Comments.Add(commnet);
             }
         }
 
+          
 
-        public Result<TEntity> Save<TEntity>(TEntity entity, InvocationContext context) where TEntity : CoreObject
+        public override Result<TEntity> Save<TEntity>(TEntity entity, InvocationContext context)
         {
             Result<TEntity> output = new Result<TEntity>();
             output.Success = false;
@@ -66,11 +77,65 @@ namespace Comments.Infrastructure
             return output;
         }
 
+        public override void Commit()
+        {
+            foreach(var c in _Comments)
+                InMemoryStore.Comments.Add(c);
+        }
+    }
+
+    public class CommentsReadRepository : ICommentReadRepository
+    {
+        IEventStore _store = null;
+        ICommandBus _bus = null;
+
+        public CommentsReadRepository(IEventStore _store, ICommandBus _bus)
+        {
+            this._store = _store;
+            this._bus = _bus;
+        }
+
+        public static readonly string Identifier = "CommentsRepositoryRead";
+
+        public void Build()
+        {
+            if (_store != null )
+            {
+                var changes = _store.GetAllEvents();
+
+                if (changes != null && changes.Count() > 0)
+                {
+                    foreach (var change in changes)
+                    {
+                        _bus.Replay(change);
+                    }
+                }
+            }
+        }
+
+
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    if (_store != null)
+                        _store.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
+
         public void Dispose()
         {
-            if (_store != null)
-                _store.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+ 
 
         public IQueryable GetQueryable(Type t)
         {
@@ -83,7 +148,7 @@ namespace Comments.Infrastructure
         }
 
         public IQueryable<TEntity> GetQueryable<TEntity>()
-            where TEntity : CoreObject
+            where TEntity : AggregateRoot
         {
             if (typeof(TEntity) == typeof(Comment))
             {
@@ -98,6 +163,35 @@ namespace Comments.Infrastructure
             get {
                 return InMemoryStore.Comments;
             }
+        }
+
+
+        public IQueryable<TEntity> BuildQuery<TEntity>(QueryOptions options)
+           where TEntity : AggregateRoot
+        {
+            var q = this.GetQueryable<TEntity>();
+
+            if (options != null)
+            {
+                if (options.HasLimit())
+                {
+                    q = q.Take(options.GetLimit());
+                }
+            }
+
+            return q;
+        }
+
+        public IEnumerable<TEntity> ExecuteList<TEntity>(IQueryable<TEntity> query)
+             where TEntity : AggregateRoot
+        {
+            return query.ToList();
+        }
+
+        public TEntity ExecuteSingle<TEntity>(IQueryable<TEntity> query)
+            where TEntity : AggregateRoot
+        {
+            return query.SingleOrDefault();
         }
     }
 

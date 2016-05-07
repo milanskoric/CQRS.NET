@@ -7,8 +7,9 @@ using SharedKernel;
 
 namespace Comments.Core
 {
-     [Serializable]
-    public class CreateCommentCommand : CommandMessage
+    //  A message sent to tell the system to do something
+    [Serializable]
+    public class CreateComment : CommandMessage
     {
 
         public string Content { get; set; }

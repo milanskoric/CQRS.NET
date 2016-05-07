@@ -5,11 +5,25 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using Microsoft.Practices.ServiceLocation;
 
 namespace CQRS.NET.Controllers
 {
     public class CommentController : Controller
     {
+        ICommandBus _bus = null;
+
+        public CommentController()
+            :this(ServiceLocator.Current.TryGet<ICommandBus>())
+        {
+            
+        }
+
+        public CommentController(ICommandBus bus)
+        {
+            this._bus = bus;
+        }
+
         // GET: Comment
         public ActionResult Index()
         {
@@ -20,8 +34,8 @@ namespace CQRS.NET.Controllers
         public ActionResult Command(string name, [DynamicJson]  dynamic dataTransferObject)
         {
             ICommandMessage cmd = Mapper.Map<ICommandMessage>(name, dataTransferObject);
-            
-            Result r = CommandBus.Submit(cmd, GetCurrentContext());
+
+            Result r = _bus.Send(cmd, GetCurrentContext());
 
             return ToActionResult(r);
  

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Comments.Domain 
 {
-     [Serializable]
+    [Serializable]
     public class CommentCreatedEvent : DomainEvent<Comment>
     {
         public CommentCreatedEvent(Comment data)

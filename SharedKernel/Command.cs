@@ -14,6 +14,10 @@ namespace SharedKernel
         
     }
 
+    //The interface ICommandMessage is now just using for IoC purpose to hook 
+    //corresponding Command Handler object.
+
+
     [Serializable]
     public abstract class CommandMessage : ICommandMessage
     {
@@ -21,21 +25,11 @@ namespace SharedKernel
         {
             this.TimeStamp = TimeProvider.Now();
             this.CorrelationId = IdentityGenerator.GenerateUniqueTickIdentifer();
-           
         }
 
-        public DateTime TimeStamp
-        {
-            get;
-            protected set;
-        }
+        public DateTime TimeStamp { get; protected set; }
 
-        public string CorrelationId
-        {
-            get;
-            protected set;
-        }
- 
+        public string CorrelationId { get; protected set;}
     }
 
     public interface IValidationHandler<in TParameter> where TParameter : ICommandMessage
@@ -45,7 +39,7 @@ namespace SharedKernel
     }
 
     // Interface for command handlers - has a type parameters for the command
-    public interface ICommandHandler<in TParameter> : ICommand 
+    public interface ICommandHandler<in TParameter> : ICommand , IDisposable
         where TParameter : ICommandMessage
     {
         
@@ -66,10 +60,19 @@ namespace SharedKernel
     public abstract class CommandHandler<TParameter> : ICommandHandler<TParameter> 
         where TParameter : ICommandMessage
     {
+        public IUnitOfWork UnitOfWork { get; protected set; }
+
         public CommandHandler()
         {
             this.Result = new Result();
         }
+
+        public CommandHandler(IUnitOfWork repository)
+            : this()
+        {
+            this.UnitOfWork = repository;
+        }
+
         public Result Result { get; protected set; }
 
         public IMessage Input { get; set; }
@@ -98,6 +101,8 @@ namespace SharedKernel
             }
             catch (Exception ex)
             {
+                OnError(ex);
+
                 output.Message = ex.ToString();
             }
             finally
@@ -107,26 +112,18 @@ namespace SharedKernel
                 output.ExecuteTime = sw.Elapsed.ToReadableHourString();
             }
 
-            if (output.Data is CoreObject)
-            {
-                var aggregateRoot = output.Data as CoreObject;
-
-                if (aggregateRoot.HasChanges())
-                {
-                    foreach (var change in aggregateRoot.Changes)
-                    {
-                        if (change.CorrelationId == aggregateRoot.CorrelationId)
-                            change.AggregateRootID = aggregateRoot.Id;
- 
-                        change.SourceName = this.GetType().Name;
-                        change.Payload = command;
-                        
-                        CommandBus.RaiseEvent(change, context);
-                    }
-                }
-            }
-
             return output;
+        }
+
+        protected virtual void OnError(Exception ex)
+        {
+             
+        }
+
+        public virtual void Dispose()
+        {
+            if (this.UnitOfWork != null)
+                this.UnitOfWork.Dispose();
         }
     }
 
@@ -135,6 +132,14 @@ namespace SharedKernel
     // Describes the result of a validation of a potential change through a business service
     public class ValidationResult : Result
     {
+        public ValidationResult(int code, string target, string message, string correlationId)
+        {
+            this.Code = code;
+            this.Target = target;
+            this.ObjectId = correlationId;
+            this.Success = false;
+        }
+
         // Gets or sets the code of the validation error
         public int Code { get; set; }
 
@@ -182,6 +187,7 @@ namespace SharedKernel
             handler.Execute();
 
             return handler.Result;
+
         }
 
 

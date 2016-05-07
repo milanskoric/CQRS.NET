@@ -63,12 +63,42 @@ namespace SharedKernel
             }
         }
 
-        public static string GetReadRepositoryName(this CoreObject item)
+        public static string GetReadRepositoryName<TEntity>()
+            where TEntity : AggregateRoot
+        {
+
+            try
+            {
+                return typeof(TEntity).Namespace.Split('.')[0] + "RepositoryRead";
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+        }
+
+        public static string GetReadRepositoryName(this AggregateRoot item)
         {
 
             try
             {
                 return item.GetType().Namespace.Split('.')[0] + "RepositoryRead";
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+        }
+
+        public static string GetRepositoryName<TMessage>()
+            where TMessage : IQueryMessage
+        {
+
+            try
+            {
+                return typeof(TMessage).Namespace.Split('.')[0] + "Repository";
             }
             catch
             {
@@ -82,7 +112,7 @@ namespace SharedKernel
 
             try
             {
-                return item.GetType().Namespace.Split('.')[0] + "RepositoryRead";
+                return item.GetType().Namespace.Split('.')[0] + "Repository";
             }
             catch
             {
@@ -91,11 +121,34 @@ namespace SharedKernel
 
         }
 
-        public static string GetWriteRepositoryName(this CoreObject item) {
+        public static string GetReadUnitOfWorkName<TEntity>()
+    where TEntity : AggregateRoot
+        {
+
+            return GetUnitOfWorkName<TEntity>() + "Read";
+
+        }
+
+        public static string GetUnitOfWorkName<TEntity>()
+            where TEntity : AggregateRoot
+        {
 
             try
             {
-                return item.GetType().Namespace.Split('.')[0] + "RepositoryWrite";
+                return typeof(TEntity).Namespace.Split('.')[0] + "UnitOfWork";
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+        }
+
+        public static string GetUnitOfWorkName(this AggregateRoot item) {
+
+            try
+            {
+                return item.GetType().Namespace.Split('.')[0] + "UnitOfWork";
             }
             catch
             {

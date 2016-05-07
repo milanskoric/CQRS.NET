@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -11,53 +12,11 @@ namespace SharedKernel.Infrastructure
 {
     public abstract class Repository : IRepository
     {
-        protected DataContext dataContext = null;
+        protected readonly DataContext dataContext = null;
 
         public Repository(DataContext dataContext)
         {
             this.dataContext = dataContext;
-        }
-
-        public virtual Result<TEntity> Save<TEntity>(TEntity entity, InvocationContext context)
-            where TEntity : CoreObject
-        {
-            Result<TEntity> output = new Result<TEntity>();
-
-            var dbSet = this.dataContext.Set<TEntity>();
-
-            bool IsAdded = entity.IsTransient();
-
-            if (IsAdded)
-            {
-                dbSet.Add(entity);
-            }
-            else
-            {
-                DbEntityEntry dbEntityEntry = this.dataContext.Entry(entity);
-
-                if (dbEntityEntry.State == EntityState.Detached)
-                {
-                    dbSet.Attach(entity);
-                }
-
-                this.dataContext.Entry(entity).State = EntityState.Modified;
-            }
-
-            int rows = this.dataContext.SaveChanges();
-
-            output.RecordsAffected = rows;
-            output.Data = entity;
-            output.ObjectId = entity.Id.ToString();
-            output.Success = true;
-
-            //output.ApplyChangeEvent<T>(entity);
-
-            return output;
-        }
-
-        public void Dispose()
-        {
-            dataContext.Dispose();
         }
 
         public bool Build()
@@ -79,7 +38,7 @@ namespace SharedKernel.Infrastructure
         }
 
         public IQueryable<TEntity> GetQueryable<TEntity>()
-            where TEntity : CoreObject
+            where TEntity : AggregateRoot
             
         {
             DbQuery<TEntity> set;
@@ -92,5 +51,54 @@ namespace SharedKernel.Infrastructure
             return output; 
                   
         }
+
+        public IQueryable<TEntity> BuildQuery<TEntity>(QueryOptions options)
+           where TEntity : AggregateRoot
+        {
+            var q = this.GetQueryable<TEntity>();
+
+            if (options != null)
+            {
+                if (options.HasLimit())
+                {
+                    q = q.Take(options.GetLimit());
+                }
+            }
+
+            return q;
+        }
+
+        public IEnumerable<TEntity> ExecuteList<TEntity>(IQueryable<TEntity> query)
+     where TEntity : AggregateRoot
+        {
+            return query.ToList();
+        }
+
+        public TEntity ExecuteSingle<TEntity>(IQueryable<TEntity> query)
+            where TEntity : AggregateRoot
+        {
+            return query.SingleOrDefault();
+        }
+
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    dataContext.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
     }
 }

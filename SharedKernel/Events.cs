@@ -22,7 +22,7 @@ namespace SharedKernel
 
     [Serializable]
      public abstract class DomainEvent<TEntity> : IDomainEvent
-        where TEntity : CoreObject
+        where TEntity : AggregateRoot
     {
          public DomainEvent()
          {
@@ -83,12 +83,23 @@ namespace SharedKernel
     public abstract class DomainEventHandler<TParameter> : IEventHandler<TParameter>
         where TParameter : IDomainEvent
     {
+        public DomainEventHandler(IUnitOfWork unitOfWork)
+        {
+            this.UnitOfWork = unitOfWork;
+        }
+
         protected abstract void Handle(TParameter change, InvocationContext context);
   
         public IDomainEvent Input
         {
             get;
             set;
+        }
+
+        public IUnitOfWork UnitOfWork
+        {
+            get;
+            protected set;
         }
 
         public void Execute()
@@ -101,6 +112,28 @@ namespace SharedKernel
             get;
             set;
         }
+
+       private bool disposed = false;
+
+       protected virtual void Dispose(bool disposing)
+       {
+           if (!this.disposed)
+           {
+               if (disposing)
+               {
+                   if (UnitOfWork!=null)
+                    UnitOfWork.Dispose();
+               }
+           }
+           this.disposed = true;
+       }
+
+       public void Dispose()
+       {
+           Dispose(true);
+           GC.SuppressFinalize(this);
+       }
+
     }
 
      // Interface for event handlers - has a type parameters for the event

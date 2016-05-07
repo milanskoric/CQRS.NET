@@ -24,22 +24,34 @@ namespace Comments.Infrastructure
         public DbSet<Comments.Domain.Comment> Comments { get; set; }
     }
 
-    public class CommentRepository : Repository, ICommentRepository
+    public class CommentRepository : Repository, ICommentWriteRepository
     {
         public static readonly string Identifier = "CommentsRepositoryWrite";
+
         public CommentRepository()
             :base(new CommentsContext())
-        { 
-        
+        {
+            this._Context = this.dataContext as CommentsContext;
         }
+
+        private readonly CommentsContext _Context;
 
         public IQueryable<Comments.Domain.Comment> Comments
         {
-            get { return (this.dataContext as CommentsContext).Comments; }
+            get { return this._Context.Comments; }
         }
+    }
 
+    public class CommentUnitOfWork : UnitOfWork, ICommentUnitOfWork
+    {
 
- 
+        public static readonly string Identifier = "CommentsUnitOfWork";
+
+        public CommentUnitOfWork(ICommentWriteRepository repository)
+            : base(new CommentsContext(), repository)
+        {
+
+        }
     }
 
  

@@ -69,9 +69,8 @@
     <Compile Include="Query.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StoreValue.cs" />
-    <Compile Include="Repository.cs" />
     <Compile Include="Result.cs" />
-    <Compile Include="TechnicalObject.cs" />
+    <Compile Include="AggregateRoot.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

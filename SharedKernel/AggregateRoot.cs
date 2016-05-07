@@ -12,7 +12,7 @@ namespace SharedKernel
 {
     [DataContract]
     [Serializable]
-    public abstract class CoreObject : IEntity<long>, IEventSourcedEntity
+    public abstract class AggregateRoot : IEntity<long>, IEventSourcedEntity
     {
         /// <summary>
         ///     Get or Set Primary Id

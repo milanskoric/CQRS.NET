@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 
 namespace Comments.Core 
 {
-    public interface ICommentRepository : IRepository
+    public interface ICommentReadRepository : IRepository
+    {
+
+    }
+
+    public interface ICommentWriteRepository : IRepository
     {
         
     }
 
- 
+    public interface ICommentUnitOfWork : IUnitOfWork
+    {
+
+    }
 }

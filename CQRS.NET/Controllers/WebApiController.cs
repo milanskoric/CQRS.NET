@@ -15,34 +15,44 @@ namespace CQRS.NET.Controllers
     [RoutePrefix("api")]
     public class WebApiController : ApiController
     {
-        [Route("command/{name:alpha}")] 
-        [HttpPost]
-        public HttpResponseMessage Command(string name, [FromBody] dynamic dataTransferObject, [FromUri] CommandOptions options)
+        ICommandBus _bus = null;
+        IQueryDispatcher _queryDispatcher = null;
+
+        public WebApiController()
+            : this(ServiceLocator.Current.TryGet<ICommandBus>(), 
+                ServiceLocator.Current.TryGet<IQueryDispatcher>())
         {
-            ICommandMessage cmd = Mapper.Map<ICommandMessage>(name, ToDynamic(dataTransferObject));
 
-            if (cmd == null)
-                return ToResponse(Result.GetBadReqResult(), options);
+        }
 
-            Result r = CommandBus.Submit(cmd, GetCurrentContext(options));
-
-            return ToResponse(r, options);
+        public WebApiController(ICommandBus bus, IQueryDispatcher queryDispatcher)
+        {
+            _bus = bus;
+            _queryDispatcher = queryDispatcher;
         }
 
         [Route("query/{name:alpha}")]
         [HttpPost]
-        public HttpResponseMessage Query(string name, [FromBody] dynamic dataTransferObject, [FromUri] QueryOptions options)
+        public HttpResponseMessage Query(string name, [FromBody] dynamic dataTransferObject, 
+            [FromUri] QueryOptions options)
         {
             IQueryMessage query = Mapper.Map<IQueryMessage>(name, ToDynamic(dataTransferObject));
 
-            if (query == null)
-                return ToQueryResponse(Result.GetBadReqResult(), options);
-
-            IQueryDispatcher qd = ServiceLocator.Current.TryGet<IQueryDispatcher>();
-
-            Result r = qd.Dispatch<IQueryMessage>(query, GetCurrentContext(options));
+            Result r = _queryDispatcher.Dispatch<IQueryMessage>(query, GetCurrentContext(options));
 
             return ToQueryResponse(r, options);
+        }
+
+        [Route("command/{name:alpha}")]
+        [HttpPost]
+        public HttpResponseMessage Command(string name, [FromBody] dynamic dataTransferObject, 
+            [FromUri] CommandOptions options)
+        {
+            ICommandMessage cmd = Mapper.Map<ICommandMessage>(name, ToDynamic(dataTransferObject));
+
+            Result r = _bus.Send(cmd, GetCurrentContext(options));
+
+            return ToResponse(r, options);
         }
 
         private dynamic ToDynamic(object expando)
@@ -70,8 +80,6 @@ namespace CQRS.NET.Controllers
 
                 return d;
             }
-
-            return null;
         }
 
         private HttpResponseMessage ToQueryResponse(Result r, QueryOptions options)

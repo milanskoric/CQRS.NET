@@ -19,7 +19,7 @@ namespace SharedKernel
     //}
 
     // Interface for query handlers - has two type parameters for the query and the query result
-    public interface IQueryHandler<TParameter> : ICommand
+    public interface IQueryHandler<TParameter> : ICommand, IDisposable
         where TParameter : IQueryMessage
     {
         
@@ -30,9 +30,14 @@ namespace SharedKernel
     public abstract class QueryHandler<TParameter> : IQueryHandler<TParameter> 
         where TParameter : IQueryMessage
     {
+        public QueryHandler(IRepository repository)
+        {
+            this.Repository = repository;
+        }
+
         protected abstract Result Retrieve(TParameter query, InvocationContext context);
 
-
+        public IRepository Repository { get; protected set; }
         public InvocationContext Context { get;set;}
 
         public IMessage Input
@@ -68,14 +73,28 @@ namespace SharedKernel
             get;
             protected set;
         }
+
+        public virtual void Dispose()
+        {
+            if (this.Repository != null)
+                this.Repository.Dispose();
+        }
     }
 
-    // Interface for the query dispatcher itself
+    //  Interface for the query dispatcher itself
+    //  The query dispacther takes query definition with options 
+    //  and context as argument and resturns the result
     public interface IQueryDispatcher
     {
         Result Dispatch<TParameter>(TParameter query, InvocationContext ctx)
             where TParameter : IQueryMessage;
+
+        Task<Result> DispatchAsync<TParameter>(TParameter query, InvocationContext ctx)
+            where TParameter : IQueryMessage;
     }
+
+
+
 
     public class QueryDispatcher : IQueryDispatcher
     {
@@ -90,7 +109,6 @@ namespace SharedKernel
 
             this.locator = locator;
         }
-
 
         public Result Dispatch<TParameter>(TParameter query, InvocationContext context) where TParameter : IQueryMessage
         {
@@ -111,10 +129,35 @@ namespace SharedKernel
             return handler.Result;
         }
 
+        public async Task<Result> DispatchAsync<TParameter>(TParameter query, InvocationContext context) where TParameter : IQueryMessage
+        {
+            Task<Result> output = Task.Factory.StartNew(() =>
+            {
+                return Dispatch<TParameter>(query, context);
+            });
+
+            return await output;
+        }
+
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+ 
+                    
+                }
+            }
+            this.disposed = true;
+        }
 
         public void Dispose()
         {
-
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

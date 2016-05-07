@@ -99,12 +99,22 @@ namespace Comments.Infrastructure
             }
 
             //Register Write Repository
-            container.RegisterType<IRepository, CommentRepository>(
-                    CommentRepository.Identifier);
+            container.RegisterType<IRepository, CommentRepository>(CommentRepository.Identifier);
 
+            container.RegisterType<ICommentWriteRepository, CommentRepository>();
+
+            container.RegisterType<IUnitOfWork, CommentUnitOfWork>(
+                CommentUnitOfWork.Identifier);
+             
             //Register Read Repository
-            container.RegisterType<IRepository, CommentsReadRepository>( //CommentRepository - CommentsReadRepository
+            container.RegisterType<IRepository, CommentsReadRepository>(  
                 CommentsReadRepository.Identifier);
+
+            container.RegisterType<ICommentReadRepository, CommentsReadRepository>();
+
+           container.RegisterType<IUnitOfWork, CommentsReadUnitOfWork>(
+                CommentsReadUnitOfWork.Identifier);
+             
 
             //Register handler for the event
             container.RegisterType <IEventHandler<CommentCreatedEvent> , CommentCreatedEventHandler > ();
@@ -115,7 +125,9 @@ namespace Comments.Infrastructure
         {
             IEventStore eventStore = ServiceLocator.Current.TryGet<IEventStore>();
 
-            new CommentsReadRepository(eventStore).Build();
+            ICommandBus bus = ServiceLocator.Current.TryGet<ICommandBus>();
+
+            new CommentsReadRepository(eventStore, bus).Build();
 
             //Create store if not exsist
             return new CommentRepository().Build();

@@ -52,11 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventHandler\CreateCommendCommandHandler.cs" />
+    <Compile Include="EventHandler\CommentCreatedEventHandler.cs" />
     <Compile Include="Event\CommandCreatedEvent.cs" />
     <Compile Include="QueryHandler\FindAllCommentsQueryHandler.cs" />
     <Compile Include="ValidationHandler\CanAddCommentValidationHandler.cs" />
-    <Compile Include="CommandHandler\CreateCommendCommandHandler.cs" />
+    <Compile Include="CommandHandler\CreateCommentCommandHandler.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

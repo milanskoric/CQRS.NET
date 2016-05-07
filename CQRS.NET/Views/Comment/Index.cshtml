@@ -8,8 +8,8 @@
 <script>
     function btnPostOnClick() {
         var cmd = new Object();
-        cmd.Content = "Sinergija 15";
-        var url = '/api/Command/CreateCommentCommand';
+        cmd.Content = "#Tarabica16 - POST";
+        var url = '/api/Command/CreateComment';
 
         $.ajax({
             url: url,
@@ -33,8 +33,8 @@
 
     function btnPostWihtResultOnClick() {
         var cmd = new Object();
-        cmd.Content = "Sinergija 15";
-        var url = '/api/Command/CreateCommentCommand?Format=json';
+        cmd.Content = "#Tarabica16 - POST WITH RESULT";
+        var url = '/api/Command/CreateComment?Format=json';
 
         $.ajax({
             url: url,
@@ -61,8 +61,8 @@
     }
     function btnPostAsyncOnClick() {
         var cmd = new Object();
-        cmd.Content = "Sinergija 15";
-        var url = '/api/Command/CreateCommentCommand?Format=json&IsAsync=true';
+        cmd.Content = "#Tarabica16 - POST Async";
+        var url = '/api/Command/CreateComment?Format=json&IsAsync=true';
 
         $.ajax({
             url: url,

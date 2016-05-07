@@ -11,15 +11,16 @@ namespace Comments.Core
     {
         public string Key { get; set; }
 
-
         public DateTime TimeStamp
         {
-            get { throw new NotImplementedException(); }
+            get;
+            set;
         }
 
         public string CorrelationId
         {
-            get { throw new NotImplementedException(); }
+            get;
+            set;
         }
     }
 }
